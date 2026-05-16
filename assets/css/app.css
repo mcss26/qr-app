@@ -506,39 +506,56 @@ body.scanner-mode {
 
 /* ── Print Styles ──────────────────────────────────────────────────────── */
 @media print {
-  body * { visibility: hidden !important; }
-  #printArea, #printArea * { visibility: visible !important; }
+  @page { margin: 0; }
+  
+  body * { display: none !important; }
+  
   #printArea {
+    display: block !important;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
   }
+  
+  #printArea * { 
+    display: block !important; 
+  }
+
   .ticket {
     width: var(--paper-mm);
+    break-after: page;
     page-break-after: always;
-    display: flex;
+    display: flex !important;
     justify-content: center;
     padding: 4mm 0;
   }
+  
   .ticket-inner {
     text-align: center;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
   }
+  
   .t-title {
     font-family: Arial, sans-serif;
     font-size: 4mm;
     font-weight: bold;
     margin-bottom: 2mm;
   }
+  
   .t-qr canvas, .t-qr img {
     width: var(--qr-mm) !important;
     height: var(--qr-mm) !important;
+    display: block !important;
   }
+  
   .t-code {
     font-family: monospace;
     font-size: 2.5mm;
     margin-top: 1mm;
-    color: #333;
+    color: #000;
   }
 }
 
