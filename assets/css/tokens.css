@@ -1,0 +1,101 @@
+/* =========================================================================
+   QR GATE APP — DESIGN TOKENS (Subset of Midnight Club System)
+   ========================================================================= */
+:root {
+  /* Neutral Palette (Zinc) */
+  --neutral-0: #000000;
+  --neutral-50: #050505;
+  --neutral-100: #0a0a0a;
+  --neutral-150: #111111;
+  --neutral-200: #18181b;
+  --neutral-300: #27272a;
+  --neutral-400: #3f3f46;
+  --neutral-500: #52525b;
+  --neutral-600: #71717a;
+  --neutral-700: #a1a1aa;
+  --neutral-800: #d4d4d8;
+  --neutral-900: #e4e4e7;
+  --neutral-950: #f4f4f5;
+  --neutral-1000: #ffffff;
+
+  /* Alpha */
+  --white-alpha-05: rgba(255, 255, 255, 0.05);
+  --white-alpha-08: rgba(255, 255, 255, 0.08);
+  --white-alpha-10: rgba(255, 255, 255, 0.1);
+  --white-alpha-20: rgba(255, 255, 255, 0.2);
+  --black-alpha-60: rgba(0, 0, 0, 0.6);
+
+  /* Semantic Colors */
+  --danger: #f87171;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --info: #60a5fa;
+
+  /* Surfaces */
+  --bg-body: #000000;
+  --bg-surface: #0a0a0a;
+  --bg-surface-hover: #111111;
+  --bg-elevated: #18181b;
+  --backdrop: var(--black-alpha-60);
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-placeholder: #8a8a93;
+
+  /* Borders */
+  --border-subtle: var(--white-alpha-10);
+  --border-active: var(--white-alpha-20);
+
+  /* Typography */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", monospace;
+  --fs-xs: 10px;
+  --fs-sm: 11px;
+  --fs-md: 12px;
+  --fs-base: 13px;
+  --fs-lg: 14px;
+  --fs-xl: 16px;
+  --fs-2xl: 24px;
+  --fs-3xl: 40px;
+  --fs-4xl: 64px;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Geometry */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.35), 0 16px 48px rgba(0,0,0,0.25);
+  --shadow-xl: 0 16px 32px rgba(0,0,0,0.4), 0 32px 64px rgba(0,0,0,0.3);
+
+  /* Z-Index */
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-toast: 1200;
+
+  /* Print */
+  --paper-mm: 80mm;
+  --qr-mm: 35mm;
+}

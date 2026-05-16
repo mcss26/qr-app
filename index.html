@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline';
+      connect-src 'self' ws: wss: https://iyknbgmcnbpvalvsjxjz.supabase.co;
+      img-src 'self' data:;
+      font-src 'self';
+      frame-src 'none';">
+  <title>QR Gate — Iniciar Sesión</title>
+  <meta name="theme-color" content="#0a0a0a">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+
+  <!-- Supabase & Core JS -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="assets/js/core/config.js"></script>
+  <script defer src="assets/js/core/supabase-client.js"></script>
+  <script defer src="assets/js/core/auth.js"></script>
+
+  <!-- Login Module -->
+  <script src="assets/js/modules/login.js" defer></script>
+</head>
+
+<body class="login">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>QR GATE</h1>
+        <p>Control de acceso</p>
+      </div>
+
+      <form id="login-form">
+        <div class="auth-field">
+          <input type="email" id="email" required autocomplete="email" placeholder="Email" />
+        </div>
+
+        <div class="auth-field">
+          <input type="password" id="password" required autocomplete="current-password" placeholder="Contraseña" />
+        </div>
+
+        <div id="login-error" class="error-message" role="alert" aria-live="polite"></div>
+
+        <button type="submit" class="btn-submit">Ingresar</button>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

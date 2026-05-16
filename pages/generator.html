@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline';
+      connect-src 'self' ws: wss: https://iyknbgmcnbpvalvsjxjz.supabase.co;
+      img-src 'self' data:;
+      font-src 'self';
+      frame-src 'none';">
+  <title>QR Gate — Generar</title>
+  <meta name="theme-color" content="#0a0a0a">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/app.css" />
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script defer src="../assets/js/core/config.js"></script>
+  <script defer src="../assets/js/core/supabase-client.js"></script>
+  <script defer src="../assets/js/core/auth.js"></script>
+  <script defer src="../assets/js/core/toast.js"></script>
+  <script defer src="../assets/js/modules/generator.js"></script>
+</head>
+
+<body>
+  <!-- Top Bar -->
+  <nav class="topbar">
+    <a href="dashboard.html" class="topbar-brand">QR GATE <span>/ Generar</span></a>
+    <div class="topbar-actions">
+      <a href="dashboard.html" class="btn btn-ghost">← Panel</a>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <!-- Config -->
+    <div class="gen-config">
+      <div class="form-group">
+        <label class="form-label" for="qty">Cantidad de QRs</label>
+        <input type="number" id="qty" class="form-input" value="50" min="1" max="500" />
+      </div>
+
+      <div class="gen-row">
+        <div class="form-group">
+          <label class="form-label" for="paperSize">Ancho Papel</label>
+          <select id="paperSize" class="form-select">
+            <option value="80">80 mm</option>
+            <option value="58">58 mm</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="qrSize">Tamaño QR</label>
+          <select id="qrSize" class="form-select">
+            <option value="35">35 mm</option>
+            <option value="30">30 mm</option>
+            <option value="25">25 mm</option>
+            <option value="40">40 mm</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="titleText">Título del Ticket (opcional)</label>
+        <input type="text" id="titleText" class="form-input" placeholder="Ej: MIDNIGHT CLUB" />
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+      <button id="btnPreview" class="btn btn-ghost" style="flex:1;">Previsualizar</button>
+      <button id="btnGenerate" class="btn btn-primary" style="flex:1;">Guardar e Imprimir</button>
+    </div>
+
+    <!-- Preview Meta -->
+    <div class="preview-meta" id="previewMeta">Configurá y hacé clic en Previsualizar</div>
+
+    <!-- Preview Area -->
+    <div class="preview-area" id="previewArea">
+      <div class="empty-state">
+        <div class="empty-state-icon">🎫</div>
+        <div class="empty-state-text">Sin códigos aún</div>
+      </div>
+    </div>
+
+    <!-- Hidden Print Area -->
+    <div id="printArea" style="display:none;"></div>
+  </main>
+
+  <!-- Confirm Modal -->
+  <div class="modal-backdrop" id="confirmModal">
+    <div class="modal-box">
+      <h3 id="modalTitle">Confirmar Generación</h3>
+      <p id="modalMsg">¿Generar y guardar los códigos?</p>
+      <div class="modal-actions">
+        <button id="modalCancel" class="btn btn-ghost">Cancelar</button>
+        <button id="modalConfirm" class="btn btn-primary">Sí, Generar</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

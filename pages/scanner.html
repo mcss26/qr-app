@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com;
+      style-src 'self' 'unsafe-inline';
+      connect-src 'self' ws: wss: https://iyknbgmcnbpvalvsjxjz.supabase.co;
+      img-src 'self' data: blob:;
+      font-src 'self';
+      frame-src 'none';
+      media-src 'self' blob:;">
+  <title>QR Gate — Escanear</title>
+  <meta name="theme-color" content="#0a0a0a">
+
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/app.css" />
+
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script defer src="../assets/js/core/config.js"></script>
+  <script defer src="../assets/js/core/supabase-client.js"></script>
+  <script defer src="../assets/js/core/auth.js"></script>
+  <script defer src="../assets/js/core/toast.js"></script>
+  <script defer src="../assets/js/modules/scanner.js"></script>
+</head>
+
+<body class="scanner-mode">
+  <!-- Top Navigation Floating -->
+  <div class="scanner-header">
+    <a href="dashboard.html" class="btn btn-ghost btn-icon" style="border:none; background:var(--bg-elevated); width:40px; height:40px; border-radius:50%;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    
+    <div class="status-badge idle" id="statusBadge" style="margin-bottom:0; background:var(--bg-elevated); border: 1px solid var(--border-subtle); backdrop-filter: blur(8px);">
+      <span id="statusIcon">📷</span>
+      <span id="statusText">Listo para escanear</span>
+    </div>
+
+    <div style="width: 40px;"></div> <!-- Flex spacer -->
+  </div>
+
+  <main class="scanner-main">
+    <!-- Camera Viewport (Cinematic Full Bleed) -->
+    <div class="scanner-viewport-wrapper">
+      <div id="reader"></div>
+      
+      <!-- CSS Reticle -->
+      <div class="scanner-reticle" id="reticle">
+        <div class="scanner-reticle-corner scanner-reticle-tl"></div>
+        <div class="scanner-reticle-corner scanner-reticle-tr"></div>
+        <div class="scanner-reticle-corner scanner-reticle-bl"></div>
+        <div class="scanner-reticle-corner scanner-reticle-br"></div>
+        <div class="scanner-line" id="scanLine"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Sheet (Controls & History) -->
+    <div class="scanner-bottom-sheet">
+      <!-- Handle line for visual -->
+      <div style="width: 40px; height: 4px; background: var(--border-active); border-radius: 2px; margin: 0 auto 12px;"></div>
+      
+      <!-- Stats & Input Row -->
+      <div class="scanner-controls-row">
+        <div class="scanner-stats-block">
+          <div class="scan-count" id="scanCount">0</div>
+          <div class="scan-label">Acreditados</div>
+        </div>
+        
+        <div class="scanner-input-block">
+          <form id="manualForm" style="display:flex; gap:8px; width:100%;">
+            <input type="text" id="manualCode" class="form-input manual-input" placeholder="Ingreso manual UUID..." autocomplete="off" />
+            <button type="submit" id="btnManual" class="btn btn-primary btn-icon" style="width: 48px; flex-shrink: 0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="scan-history">
+        <div class="scan-history-title">Historial Reciente</div>
+        <div id="historyList" class="history-list">
+          <div class="empty-history" id="emptyHistory">Los escaneos aparecerán aquí</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Cinematic Result Overlay -->
+  <div class="scan-overlay" id="scanOverlay">
+    <div class="scan-overlay-card">
+      <div class="scan-overlay-icon" id="overlayIcon"></div>
+      <div class="scan-overlay-title" id="overlayTitle"></div>
+      <div class="scan-overlay-msg" id="overlayMsg"></div>
+    </div>
+  </div>
+</body>
+
+</html>
