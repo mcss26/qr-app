@@ -28,28 +28,37 @@
 </head>
 
 <body>
-  <!-- Top Bar -->
-  <nav class="topbar">
-    <a href="dashboard.html" class="topbar-brand">QR GATE <span>/ Panel</span></a>
-    <div class="topbar-actions">
-      <button id="btnLogout" class="btn btn-ghost btn-icon" title="Cerrar sesión">⏻</button>
+  <!-- Top Bar (CMS Standard) -->
+  <header class="topbar">
+    <div class="topbar-start">
+      <nav class="breadcrumb" aria-label="Navegación de migas">
+        <span class="breadcrumb-item current">QR GATE / PANEL</span>
+      </nav>
     </div>
-  </nav>
+    <!-- No indicator needed as per user request -->
+    <div class="topbar-end">
+      <div class="dropdown-container">
+        <button class="avatar avatar-sm" id="btnLogout" aria-label="Cerrar sesión" title="Cerrar sesión">AD</button>
+      </div>
+    </div>
+  </header>
 
   <main class="page-content">
-    <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-value" id="statTotal">—</div>
-        <div class="stat-label">Generados</div>
-      </div>
-      <div class="stat-card accent-success">
-        <div class="stat-value" id="statScanned">—</div>
-        <div class="stat-label">Escaneados</div>
-      </div>
-      <div class="stat-card accent-warning">
-        <div class="stat-value" id="statPending">—</div>
-        <div class="stat-label">Pendientes</div>
+    <!-- Stats (CMS Standard) -->
+    <div class="summary-metrics-container">
+      <div class="summary-metrics-grid">
+        <div class="summary-metric-card border-l-staff">
+          <div class="summary-metric-label">Generados</div>
+          <div class="summary-metric-value" id="statTotal">—</div>
+        </div>
+        <div class="summary-metric-card border-l-costs">
+          <div class="summary-metric-label">Escaneados</div>
+          <div class="summary-metric-value" id="statScanned">—</div>
+        </div>
+        <div class="summary-metric-card border-l-breakeven">
+          <div class="summary-metric-label">Pendientes</div>
+          <div class="summary-metric-value" id="statPending">—</div>
+        </div>
       </div>
     </div>
 

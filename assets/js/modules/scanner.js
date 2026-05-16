@@ -62,8 +62,8 @@
   const html5QrCode = new Html5Qrcode("reader");
 
   function startScanner() {
-    // Config sin qrbox para que escanee todo el cuadro del video
-    const config = { fps: 10 };
+    // Baja tasa de cuadros para ahorrar batería (Mobile-First Efficiency)
+    const config = { fps: 3 };
 
     html5QrCode.start(
       { facingMode: "environment" },
@@ -74,7 +74,7 @@
       () => { } // Ignore read errors (spammy)
     ).catch(err => {
       console.error("Scanner failed:", err);
-      setStatus('error', '⛔', 'Cámara no disponible');
+      setStatus('error', '', 'Cámara no disponible');
     });
   }
 
@@ -86,7 +86,7 @@
     isProcessing = true;
     
     // UI Feedback immediate
-    setStatus('idle', '⏳', 'Validando...');
+    setStatus('idle', '', 'Validando...');
     document.getElementById('reticle').style.borderColor = 'var(--warning)';
 
     try {
@@ -160,7 +160,7 @@
 
     // Status badge
     setStatus(success ? 'success' : 'error',
-      success ? '✓' : '✗',
+      success ? 'OK' : 'ERR',
       `${title}`);
 
     // History
@@ -169,7 +169,7 @@
     // Reset status badge after delay
     setTimeout(() => {
       if (!isProcessing) {
-        setStatus('idle', '📷', 'Listo para escanear');
+        setStatus('idle', 'RDY', 'Listo para escanear');
       }
     }, 2500);
   }

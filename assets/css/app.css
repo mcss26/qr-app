@@ -216,22 +216,7 @@ body.scanner-mode {
 .scanner-reticle-bl { bottom: -2px; left: -2px; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 24px; }
 .scanner-reticle-br { bottom: -2px; right: -2px; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 24px; }
 
-.scanner-line {
-  position: absolute;
-  left: 0; right: 0;
-  height: 2px;
-  background: var(--info);
-  box-shadow: 0 0 10px var(--info), 0 0 20px var(--info);
-  top: 0;
-  animation: scan-line 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
-  opacity: 0.8;
-}
-@keyframes scan-line {
-  0% { top: 0%; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
-}
+/* Cinematic Reticle (Static, optimized for battery) */
 
 /* Bottom Sheet */
 .scanner-bottom-sheet {
