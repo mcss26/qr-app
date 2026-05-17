@@ -141,6 +141,7 @@
       // 4. Print
       setTimeout(() => {
         window.print();
+        printArea.style.display = 'none';
         btnGenerate.disabled = false;
         btnGenerate.textContent = 'Guardar e Imprimir';
       }, 600);

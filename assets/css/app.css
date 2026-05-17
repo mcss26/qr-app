@@ -493,7 +493,7 @@ body.scanner-mode {
 @media print {
   @page { margin: 0; }
   
-  body * { display: none !important; }
+  body > *:not(#printArea) { display: none !important; }
   
   #printArea {
     display: block !important;
@@ -501,10 +501,6 @@ body.scanner-mode {
     top: 0;
     left: 0;
     width: 100%;
-  }
-  
-  #printArea * { 
-    display: block !important; 
   }
 
   .ticket {
