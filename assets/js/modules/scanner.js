@@ -74,15 +74,9 @@
       formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
     };
 
-    // HD Resolution for scanning from far away (de lejos)
-    const constraints = {
-      facingMode: "environment",
-      width: { ideal: 1280 },
-      height: { ideal: 720 }
-    };
-
+    // Usar constraints básicos para evitar OverconstrainedError en algunos móviles
     html5QrCode.start(
-      constraints,
+      { facingMode: "environment" },
       config,
       (decodedText) => {
         if (!isProcessing) validateCode(decodedText);
