@@ -497,10 +497,9 @@ body.scanner-mode {
   
   #printArea {
     display: block !important;
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
+    margin: 0;
+    padding: 0;
   }
 
   .ticket {
@@ -510,6 +509,12 @@ body.scanner-mode {
     display: flex !important;
     justify-content: center;
     padding: 4mm 0;
+    margin: 0;
+  }
+  
+  .ticket:last-child {
+    break-after: auto;
+    page-break-after: auto;
   }
   
   .ticket-inner {
