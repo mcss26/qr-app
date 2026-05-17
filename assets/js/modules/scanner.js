@@ -108,6 +108,7 @@
   async function validateCode(code) {
     if (!code || isProcessing) return;
     isProcessing = true;
+    let isSuccess = false;
     
     // UI Feedback immediate
     setStatus('idle', '', 'Validando...');
@@ -151,6 +152,7 @@
 
       if (updateErr) throw updateErr;
 
+      isSuccess = true;
       sessionCount++;
       scanCount.textContent = sessionCount;
       handleResult(true, 'ACCESO OK', '¡Código válido!', code);
@@ -159,12 +161,13 @@
       console.error('[Scanner] Error:', err);
       handleResult(false, 'ERROR', 'Error de red. Reintenta.', code);
     } finally {
-      // Cinematic timeout before allowing next scan
+      // Dynamic timeout: very fast for OK (continuous flow), slower for errors (to read)
+      const delay = isSuccess ? 600 : 1500;
       setTimeout(() => { 
         isProcessing = false; 
         document.getElementById('reticle').className = 'scanner-reticle';
         document.getElementById('reticle').style.borderColor = '';
-      }, 2500);
+      }, delay);
     }
   }
 
@@ -191,11 +194,12 @@
     addHistoryItem(success, title, code);
 
     // Reset status badge after delay
+    const delay = success ? 600 : 1500;
     setTimeout(() => {
       if (!isProcessing) {
         setStatus('idle', 'RDY', 'Listo para escanear');
       }
-    }, 2500);
+    }, delay);
   }
 
   // 8. Overlay
@@ -215,8 +219,9 @@
       setTimeout(() => scanOverlay.classList.remove('shake'), 500);
     }
 
-    // Cinematic fade out
-    setTimeout(() => scanOverlay.classList.remove('active'), 2000);
+    // Cinematic fade out (sync with delay)
+    const fadeDelay = success ? 500 : 1400;
+    setTimeout(() => scanOverlay.classList.remove('active'), fadeDelay);
   }
 
   // 9. Status Badge
