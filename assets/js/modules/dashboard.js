@@ -73,10 +73,10 @@
 
     try {
       // Delete codes first (FK dependency), then batches
-      const { error: e1 } = await sb.from('qr_codes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      const { error: e1 } = await sb.from('qr_codes').delete().not('id', 'is', null);
       if (e1) throw e1;
 
-      const { error: e2 } = await sb.from('qr_batches').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      const { error: e2 } = await sb.from('qr_batches').delete().not('id', 'is', null);
       if (e2) throw e2;
 
       window.Toast.success('Base limpiada. Lista para nueva fecha.');
