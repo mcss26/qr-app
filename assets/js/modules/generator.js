@@ -186,6 +186,13 @@
         height: qrPx,
         correctLevel: QRCode.CorrectLevel.H
       });
+      
+      // Asegurar que sólo se vea la imagen y no el canvas, forzando con !important
+      // para evitar duplicados en la impresión sin depender del CSS que puede estar cacheado
+      const cvs = qrDiv.querySelector('canvas');
+      if (cvs) cvs.style.setProperty('display', 'none', 'important');
+      const img = qrDiv.querySelector('img');
+      if (img) img.style.setProperty('display', 'block', 'important');
     }
 
     // Wait for QR rendering
