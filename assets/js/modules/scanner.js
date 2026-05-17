@@ -44,6 +44,10 @@
   const manualCode = document.getElementById('manualCode');
   const manualForm = document.getElementById('manualForm');
   
+  // Flash toggle
+  const btnFlash = document.getElementById('btnFlash');
+  let flashEnabled = false;
+  
   manualForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const val = manualCode.value.trim();
@@ -62,8 +66,13 @@
   const html5QrCode = new Html5Qrcode("reader");
 
   function startScanner() {
-    // Baja tasa de cuadros para ahorrar batería (Mobile-First Efficiency)
-    const config = { fps: 3 };
+    // High performance config: 15 fps (super fast), disable flip, fixed box
+    const config = { 
+      fps: 15,
+      qrbox: { width: 250, height: 250 },
+      disableFlip: true,
+      formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
+    };
 
     html5QrCode.start(
       { facingMode: "environment" },
@@ -72,7 +81,22 @@
         if (!isProcessing) validateCode(decodedText);
       },
       () => { } // Ignore read errors (spammy)
-    ).catch(err => {
+    ).then(() => {
+      // Once started, bind flash toggle
+      btnFlash.addEventListener('click', () => {
+        flashEnabled = !flashEnabled;
+        html5QrCode.applyVideoConstraints({
+          advanced: [{ torch: flashEnabled }]
+        }).then(() => {
+          btnFlash.style.color = flashEnabled ? 'var(--warning)' : '';
+        }).catch(err => {
+          console.warn('Torch no soportado', err);
+          window.Toast.error('Linterna no soportada en este dispositivo');
+          flashEnabled = false;
+          btnFlash.style.color = '';
+        });
+      });
+    }).catch(err => {
       console.error("Scanner failed:", err);
       setStatus('error', '', 'Cámara no disponible');
     });
