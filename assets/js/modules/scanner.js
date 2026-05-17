@@ -66,16 +66,23 @@
   const html5QrCode = new Html5Qrcode("reader");
 
   function startScanner() {
-    // High performance config: 15 fps (super fast), disable flip, fixed box
+    // High performance config: 15 fps
+    // qrbox is intentionally omitted so it scans the ENTIRE screen (any position)
+    // disableFlip is omitted so it scans mirrored QRs as well (any side)
     const config = { 
       fps: 15,
-      qrbox: { width: 250, height: 250 },
-      disableFlip: true,
       formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
     };
 
+    // HD Resolution for scanning from far away (de lejos)
+    const constraints = {
+      facingMode: "environment",
+      width: { ideal: 1280 },
+      height: { ideal: 720 }
+    };
+
     html5QrCode.start(
-      { facingMode: "environment" },
+      constraints,
       config,
       (decodedText) => {
         if (!isProcessing) validateCode(decodedText);
