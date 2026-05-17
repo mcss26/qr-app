@@ -526,9 +526,14 @@ body.scanner-mode {
     margin-bottom: 2mm;
   }
   
-  .t-qr canvas, .t-qr img {
+  .t-qr canvas {
+    display: none !important;
+  }
+  
+  .t-qr img {
     width: var(--qr-mm) !important;
     height: var(--qr-mm) !important;
+    display: block !important;
   }
   
   .t-code {
