@@ -529,6 +529,7 @@ body.scanner-mode {
     font-size: 4mm;
     font-weight: bold;
     margin-bottom: 2mm;
+    color: #000 !important;
   }
   
   .t-qr canvas {
