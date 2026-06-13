@@ -125,12 +125,15 @@
     // Hardware debounce (200ms) para evitar múltiples lecturas del mismo cuadro
     if (now - lastScanTime < 200) return; 
 
-    if (code === QR_UNIVERSAL_PAYLOAD) {
+    const cleanCode = (code || '').trim();
+    console.log('[DEBUG] Escaneado:', cleanCode);
+
+    if (cleanCode === QR_UNIVERSAL_PAYLOAD) {
       lastScanTime = now;
       incrementCount('QR');
     } else {
       lastScanTime = now;
-      handleError();
+      handleError(cleanCode);
     }
   }
 
@@ -161,9 +164,15 @@
     }
   }
 
-  function handleError() {
+  function handleError(scannedCode) {
     if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
     reticle.style.borderColor = 'var(--error-base)';
+    
+    // Mostramos qué escaneó en realidad para debug rápido si es erróneo
+    if (window.Toast && scannedCode) {
+      window.Toast.error(`Lectura rechazada: "${scannedCode}"`);
+    }
+
     setTimeout(() => reticle.style.borderColor = '', 200);
   }
 
