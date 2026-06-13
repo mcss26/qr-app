@@ -122,8 +122,8 @@
   // 8. Validate Code
   function validateCode(code) {
     const now = Date.now();
-    // Hardware debounce (200ms) para evitar múltiples lecturas del mismo cuadro
-    if (now - lastScanTime < 200) return; 
+    // Cooldown de 5 segundos para evitar lecturas repetidas muy rápido
+    if (now - lastScanTime < 5000) return; 
 
     const cleanCode = (code || '').trim();
     console.log('[DEBUG] Escaneado:', cleanCode);
