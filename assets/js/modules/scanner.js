@@ -41,7 +41,7 @@
 
   // 4. State
   let sessionCount = 0;
-  const QR_UNIVERSAL_PAYLOAD = 'MC_GENERAL_ACCESS';
+  const QR_UNIVERSAL_PAYLOAD = 'QR-GATE-UNIVERSAL-PASS';
   let lastScanTime = 0;
   
   // 5. Inicializar el Contador desde Supabase
