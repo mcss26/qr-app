@@ -64,35 +64,15 @@
       </div>
     </div>
 
-    <!-- Bottom Sheet (Controls & History) -->
-    <div class="scanner-bottom-sheet">
-      <!-- Handle line for visual -->
-      <div style="width: 40px; height: 4px; background: var(--border-active); border-radius: 2px; margin: 0 auto 12px;"></div>
-      
-      <!-- Stats & Input Row -->
-      <div class="scanner-controls-row">
-        <div class="scanner-stats-block">
-          <div class="scan-count" id="scanCount">0</div>
-          <div class="scan-label">Acreditados</div>
-        </div>
-        
-        <div class="scanner-input-block">
-          <form id="manualForm" style="display:flex; gap:8px; width:100%;">
-            <input type="text" id="manualCode" class="form-input manual-input" placeholder="Ingreso manual UUID..." autocomplete="off" />
-            <button type="submit" id="btnManual" class="btn btn-primary btn-icon" style="width: 48px; flex-shrink: 0;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </button>
-          </form>
-        </div>
+    <!-- Bottom Half (Counter & Manual Button) -->
+    <div class="scanner-counter-section" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background: var(--bg-base); flex: 1;">
+      <div class="counter-display" style="text-align: center; margin-bottom: 2rem;">
+        <div class="scan-label" style="font-size: 1.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Acreditados</div>
+        <div class="scan-count giant-counter" id="scanCount" style="font-size: 6rem; font-weight: 800; line-height: 1; color: var(--text-base);">0</div>
       </div>
-
-      <!-- History -->
-      <div class="scan-history">
-        <div class="scan-history-title">Historial Reciente</div>
-        <div id="historyList" class="history-list">
-          <div class="empty-history" id="emptyHistory">Los escaneos aparecerán aquí</div>
-        </div>
-      </div>
+      <button type="button" id="btnManualPlus" class="btn btn-primary giant-btn" style="width: 100%; padding: 1.5rem; font-size: 2rem; font-weight: 700; border-radius: 12px; background: var(--success-base); color: #000; border: none; cursor: pointer; text-transform: uppercase;">
+        +1 MANUAL
+      </button>
     </div>
   </main>
 

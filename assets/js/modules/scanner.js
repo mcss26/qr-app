@@ -1,7 +1,7 @@
 /**
- * Scanner Module — QR Gate App
- * Camera-based QR scanning with Supabase validation.
- * No dependency on work_days. Haptic feedback only (no sound).
+ * Scanner Module — QR Gate App (Cuenta Ganado Mode)
+ * Ultra-fast scanning, zero cooldown, universal payload.
+ * Sincronizado en tiempo real mediante Supabase.
  */
 (async function () {
   'use strict';
@@ -34,56 +34,66 @@
   const statusIcon = document.getElementById('statusIcon');
   const statusText = document.getElementById('statusText');
   const scanCount = document.getElementById('scanCount');
-  const historyList = document.getElementById('historyList');
-  const scanOverlay = document.getElementById('scanOverlay');
-  const overlayIcon = document.getElementById('overlayIcon');
-  const overlayTitle = document.getElementById('overlayTitle');
-  const overlayMsg = document.getElementById('overlayMsg');
-
-  // Manual input
-  const manualCode = document.getElementById('manualCode');
-  const manualForm = document.getElementById('manualForm');
-  
-  // Flash toggle
+  const btnManualPlus = document.getElementById('btnManualPlus');
+  const reticle = document.getElementById('reticle');
   const btnFlash = document.getElementById('btnFlash');
   let flashEnabled = false;
-  
-  manualForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const val = manualCode.value.trim();
-    if (val && !isProcessing) {
-      validateCode(val);
-      manualCode.value = '';
-      manualCode.blur();
-    }
-  });
 
   // 4. State
-  let isProcessing = false;
   let sessionCount = 0;
+  const QR_UNIVERSAL_PAYLOAD = 'MC_GENERAL_ACCESS';
+  let lastScanTime = 0;
+  
+  // 5. Inicializar el Contador desde Supabase
+  async function initCounter() {
+    try {
+      const { data, error } = await sb
+        .from('global_counter')
+        .select('count')
+        .eq('id', 1)
+        .single();
+        
+      if (!error && data) {
+        sessionCount = data.count;
+        scanCount.textContent = sessionCount;
+      }
+      
+      // Suscribirse a cambios en tiempo real
+      sb.channel('realtime_counter')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'global_counter' }, payload => {
+          if (payload.new && payload.new.count !== undefined) {
+            sessionCount = payload.new.count;
+            scanCount.textContent = sessionCount;
+          }
+        })
+        .subscribe();
+        
+    } catch (err) {
+      console.warn("No se pudo iniciar el contador global", err);
+    }
+  }
 
-  // 5. Start Scanner
+  initCounter();
+
+  // 6. Start Scanner
   const html5QrCode = new Html5Qrcode("reader");
 
   function startScanner() {
-    // High performance config: 15 fps
-    // qrbox is intentionally omitted so it scans the ENTIRE screen (any position)
-    // disableFlip is omitted so it scans mirrored QRs as well (any side)
     const config = { 
       fps: 15,
       formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
     };
 
-    // Usar constraints básicos para evitar OverconstrainedError en algunos móviles
     html5QrCode.start(
       { facingMode: "environment" },
       config,
       (decodedText) => {
-        if (!isProcessing) validateCode(decodedText);
+        validateCode(decodedText);
       },
-      () => { } // Ignore read errors (spammy)
+      () => { } // Ignorar errores de lectura
     ).then(() => {
-      // Once started, bind flash toggle
+      setStatus('idle', 'RDY', 'Escaneando al máximo');
+      
       btnFlash.addEventListener('click', () => {
         flashEnabled = !flashEnabled;
         html5QrCode.applyVideoConstraints({
@@ -91,8 +101,7 @@
         }).then(() => {
           btnFlash.style.color = flashEnabled ? 'var(--warning)' : '';
         }).catch(err => {
-          console.warn('Torch no soportado', err);
-          window.Toast.error('Linterna no soportada en este dispositivo');
+          window.Toast.error('Linterna no soportada');
           flashEnabled = false;
           btnFlash.style.color = '';
         });
@@ -105,158 +114,63 @@
 
   startScanner();
 
-  // 6. Validate Code
-  async function validateCode(code) {
-    if (!code || isProcessing) return;
-    isProcessing = true;
-    let isSuccess = false;
-    
-    // UI Feedback immediate
-    setStatus('idle', '', 'Validando...');
-    document.getElementById('reticle').style.borderColor = 'var(--warning)';
+  // 7. Manual Button
+  btnManualPlus.addEventListener('click', () => {
+    incrementCount('Manual');
+  });
 
-    try {
-      // Query Supabase
-      const { data: qrcode, error } = await sb
-        .from('qr_codes')
-        .select('id, code, status, accredited_at')
-        .eq('code', code)
-        .single();
+  // 8. Validate Code
+  function validateCode(code) {
+    const now = Date.now();
+    // Hardware debounce (200ms) para evitar múltiples lecturas del mismo cuadro
+    if (now - lastScanTime < 200) return; 
 
-      if (error || !qrcode) {
-        handleResult(false, 'INVÁLIDO', 'No existe en el sistema', code);
-        return;
-      }
-
-      if (qrcode.status === 'ANULADO') {
-        handleResult(false, 'ANULADO', 'Código dado de baja', code);
-        return;
-      }
-
-      if (qrcode.status === 'ACREDITADO') {
-        const time = qrcode.accredited_at
-          ? new Date(qrcode.accredited_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-          : '??';
-        handleResult(false, 'YA USADO', `Ingresó a las ${time}`, code);
-        return;
-      }
-
-      // Status is PENDIENTE → Acreditar
-      const { error: updateErr } = await sb
-        .from('qr_codes')
-        .update({
-          status: 'ACREDITADO',
-          accredited_at: new Date().toISOString(),
-          accredited_by: user.id
-        })
-        .eq('id', qrcode.id);
-
-      if (updateErr) throw updateErr;
-
-      isSuccess = true;
-      sessionCount++;
-      scanCount.textContent = sessionCount;
-      handleResult(true, 'ACCESO OK', '¡Código válido!', code);
-
-    } catch (err) {
-      console.error('[Scanner] Error:', err);
-      handleResult(false, 'ERROR', 'Error de red. Reintenta.', code);
-    } finally {
-      // Dynamic timeout: very fast for OK (continuous flow), slower for errors (to read)
-      const delay = isSuccess ? 600 : 1500;
-      setTimeout(() => { 
-        isProcessing = false; 
-        document.getElementById('reticle').className = 'scanner-reticle';
-        document.getElementById('reticle').style.borderColor = '';
-      }, delay);
+    if (code === QR_UNIVERSAL_PAYLOAD) {
+      lastScanTime = now;
+      incrementCount('QR');
+    } else {
+      lastScanTime = now;
+      handleError();
     }
   }
 
-  // 7. Handle Result
-  function handleResult(success, title, msg, code) {
-    // Haptic feedback (vibration only, no sound)
-    if ('vibrate' in navigator) {
-      navigator.vibrate(success ? [100, 50, 100] : [200, 100, 200, 100, 200]);
-    }
-
-    // Reticle color flash
-    const reticle = document.getElementById('reticle');
-    reticle.className = `scanner-reticle ${success ? 'success' : 'error'}`;
-
-    // Overlay
-    showOverlay(success, title, msg);
-
-    // Status badge
-    setStatus(success ? 'success' : 'error',
-      success ? 'OK' : 'ERR',
-      `${title}`);
-
-    // History
-    addHistoryItem(success, title, code);
-
-    // Reset status badge after delay
-    const delay = success ? 600 : 1500;
+  // 9. Increment Action
+  async function incrementCount(source) {
+    // Optimistic UI: Incrementamos localmente al instante
+    sessionCount++;
+    scanCount.textContent = sessionCount;
+    
+    // Feedback Ultra-Rápido
+    if ('vibrate' in navigator) navigator.vibrate([50]); 
+    
+    reticle.style.borderColor = 'var(--success-base)';
+    reticle.style.boxShadow = '0 0 20px var(--success-base)';
+    scanCount.style.color = 'var(--success-base)';
+    
     setTimeout(() => {
-      if (!isProcessing) {
-        setStatus('idle', 'RDY', 'Listo para escanear');
-      }
-    }, delay);
-  }
+      reticle.style.borderColor = '';
+      reticle.style.boxShadow = '';
+      scanCount.style.color = '';
+    }, 150);
 
-  // 8. Overlay
-  function showOverlay(success, title, msg) {
-    scanOverlay.className = `scan-overlay active ${success ? 'success' : 'error'}`;
-
-    overlayIcon.innerHTML = success 
-      ? '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
-      : '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
-    
-    overlayTitle.textContent = title;
-    overlayMsg.textContent = msg;
-
-    // Shake on error
-    if (!success) {
-      scanOverlay.classList.add('shake');
-      setTimeout(() => scanOverlay.classList.remove('shake'), 500);
+    // Sincronizar con Supabase (Fire and Forget)
+    try {
+      await sb.rpc('increment_counter');
+    } catch (err) {
+      console.warn("Fallo incrementando en servidor", err);
     }
-
-    // Cinematic fade out (sync with delay)
-    const fadeDelay = success ? 500 : 1400;
-    setTimeout(() => scanOverlay.classList.remove('active'), fadeDelay);
   }
 
-  // 9. Status Badge
+  function handleError() {
+    if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+    reticle.style.borderColor = 'var(--error-base)';
+    setTimeout(() => reticle.style.borderColor = '', 200);
+  }
+
   function setStatus(type, icon, text) {
     statusBadge.className = `status-badge ${type}`;
     statusIcon.textContent = icon;
     statusText.textContent = text;
-  }
-
-  // 10. History UI
-  function addHistoryItem(success, title, code) {
-    const empty = document.getElementById('emptyHistory');
-    if (empty) empty.remove();
-
-    const item = document.createElement('div');
-    item.className = 'history-item';
-    const time = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    
-    // Safely extract short code
-    const shortCode = code.length > 12 ? `${code.slice(0, 8)}...${code.slice(-4)}` : code;
-
-    item.innerHTML = `
-      <div>
-        <div class="history-code">${shortCode}</div>
-        <div class="history-time" style="margin-top:2px;">${time}</div>
-      </div>
-      <span class="history-status ${success ? 'ok' : 'no'}">${title}</span>
-    `;
-    historyList.prepend(item);
-
-    // Keep max 30 items in DOM
-    while (historyList.children.length > 30) {
-      historyList.removeChild(historyList.lastChild);
-    }
   }
 
 })();

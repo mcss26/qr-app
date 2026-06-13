@@ -15,29 +15,17 @@
   document.getElementById('btnLogout').addEventListener('click', () => window.Auth.logout());
 
   // 2. Elements
-  const statTotal = document.getElementById('statTotal');
   const statScanned = document.getElementById('statScanned');
-  const statPending = document.getElementById('statPending');
 
   // 3. Load Stats
   async function loadStats() {
     try {
-      const { count: total } = await sb
-        .from('qr_codes')
-        .select('*', { count: 'exact', head: true });
-
       const { count: scanned } = await sb
         .from('qr_codes')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'ACREDITADO');
 
-      const t = total || 0;
-      const s = scanned || 0;
-      const p = t - s;
-
-      statTotal.textContent = t;
-      statScanned.textContent = s;
-      statPending.textContent = p;
+      statScanned.textContent = scanned || 0;
     } catch (err) {
       console.error('[Dashboard] Error loading stats:', err);
     }

@@ -43,12 +43,7 @@
 
   // 4. Generate Payloads
   function generatePayloads() {
-    const qty = Math.max(1, Math.min(500, parseInt(qtyInput.value || 1)));
-    const out = [];
-    for (let i = 0; i < qty; i++) {
-      out.push(generateUUID());
-    }
-    return out;
+    return ['QR-GATE-UNIVERSAL-PASS'];
   }
 
   // 5. Preview
@@ -60,12 +55,9 @@
   function renderPreview(payloads) {
     previewArea.innerHTML = '';
 
-    const limit = Math.min(payloads.length, 50);
-    previewMeta.textContent = payloads.length > 50
-      ? `${payloads.length} códigos (vista previa: primeros 50)`
-      : `${payloads.length} códigos`;
+    previewMeta.textContent = 'Pase Universal';
 
-    payloads.slice(0, limit).forEach(text => {
+    payloads.slice(0, 1).forEach(text => {
       const card = document.createElement('div');
       card.className = 'preview-card';
 
@@ -74,7 +66,7 @@
 
       const caption = document.createElement('div');
       caption.className = 'preview-caption';
-      caption.textContent = '...' + text.slice(-8);
+      caption.textContent = 'Universal';
       card.appendChild(caption);
 
       previewArea.appendChild(card);
@@ -92,8 +84,7 @@
 
   // 6. Generate & Save
   btnGenerate.addEventListener('click', () => {
-    const qty = Math.max(1, Math.min(500, parseInt(qtyInput.value || 1)));
-    modalMsg.textContent = `¿Generar ${qty} códigos QR y guardarlos en la base de datos?`;
+    modalMsg.textContent = `¿Imprimir el Pase Universal?`;
     modal.classList.add('active');
   });
 
@@ -107,37 +98,12 @@
     try {
       const payloads = generatePayloads();
 
-      // 1. Create Batch
-      const today = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' });
-      const batchName = `Lote ${today}`;
-
-      const { data: batch, error: batchErr } = await sb
-        .from('qr_batches')
-        .insert({
-          name: batchName,
-          created_by: user.id
-        })
-        .select()
-        .single();
-
-      if (batchErr) throw batchErr;
-
-      // 2. Insert Codes (bulk)
-      const rows = payloads.map(code => ({
-        batch_id: batch.id,
-        code: code,
-        status: 'PENDIENTE'
-      }));
-
-      const { error: codesErr } = await sb.from('qr_codes').insert(rows);
-      if (codesErr) throw codesErr;
-
-      // 3. Render for Print
+      // Render for Print directly (no saving to DB)
       modal.classList.remove('active');
-      window.Toast.success(`${payloads.length} códigos guardados.`);
+      window.Toast.success(`Pase universal listo.`);
 
       btnGenerate.disabled = true;
-      btnGenerate.textContent = 'Generando tickets...';
+      btnGenerate.textContent = 'Generando ticket...';
 
       await renderPrintTickets(payloads);
 
@@ -146,7 +112,7 @@
         window.print();
         printArea.style.display = 'none';
         btnGenerate.disabled = false;
-        btnGenerate.textContent = 'Guardar e Imprimir';
+        btnGenerate.textContent = 'Imprimir Pase Universal';
       }, 600);
 
     } catch (err) {
@@ -154,7 +120,7 @@
       window.Toast.error('Error: ' + err.message);
     } finally {
       modalConfirm.disabled = false;
-      modalConfirm.textContent = 'Sí, Generar';
+      modalConfirm.textContent = 'Sí, Imprimir';
     }
   });
 
@@ -177,7 +143,7 @@
         <div class="ticket-inner">
           ${title ? `<div class="t-title">${title}</div>` : ''}
           <div class="t-qr"></div>
-          <div class="t-code">${text.slice(-8)}</div>
+          <div class="t-code">UNIVERSAL</div>
         </div>
       `;
       printArea.appendChild(ticket);
