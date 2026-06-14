@@ -42,7 +42,13 @@
   const btnManualPlus = document.getElementById('btnManualPlus');
   const reticle = document.getElementById('reticle');
   const btnFlash = document.getElementById('btnFlash');
+  const btnLogout = document.getElementById('btnLogout');
   let flashEnabled = false;
+
+  // Logout
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => window.Auth.logout());
+  }
 
   // 4. State
   let sessionCount = 0;
