@@ -116,8 +116,9 @@
       setStatus('error', '', 'Cámara no disponible');
     });
   }
-
-  startScanner();
+  // TEMPORARY DISABLED CAMERA: To re-enable, uncomment startScanner();
+  // startScanner();
+  setStatus('idle', 'MANUAL', 'Modo Cuenta Ganado Manual');
 
   // 7. Manual Button
   btnManualPlus.addEventListener('click', () => {
