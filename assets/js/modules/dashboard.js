@@ -1,6 +1,6 @@
 /**
  * Dashboard Module — QR Gate App
- * Live counters + clear database functionality.
+ * Live counters + clear database functionality (Cuenta Ganado Mode).
  */
 (async function () {
   'use strict';
@@ -17,15 +17,18 @@
   // 2. Elements
   const statScanned = document.getElementById('statScanned');
 
-  // 3. Load Stats
+  // 3. Load Stats from global_counter
   async function loadStats() {
     try {
-      const { count: scanned } = await sb
-        .from('qr_codes')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'ACREDITADO');
+      const { data, error } = await sb
+        .from('global_counter')
+        .select('count')
+        .eq('id', 1)
+        .single();
 
-      statScanned.textContent = scanned || 0;
+      if (!error && data) {
+        statScanned.textContent = data.count || 0;
+      }
     } catch (err) {
       console.error('[Dashboard] Error loading stats:', err);
     }
@@ -34,48 +37,59 @@
   // Initial load
   await loadStats();
 
-  // Auto-refresh every 10 seconds
-  setInterval(loadStats, 10000);
+  // Suscribirse a cambios en tiempo real para el Dashboard
+  sb.channel('realtime_dashboard')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'global_counter' }, payload => {
+      if (payload.new && payload.new.count !== undefined) {
+        statScanned.textContent = payload.new.count;
+      }
+    })
+    .subscribe();
 
-  // 4. Clear Database
+  // 4. Clear Database (Reset Counter)
   const btnClear = document.getElementById('btnClear');
   const modal = document.getElementById('confirmModal');
   const modalCancel = document.getElementById('modalCancel');
   const modalConfirm = document.getElementById('modalConfirm');
 
-  btnClear.addEventListener('click', () => {
-    modal.classList.add('active');
-  });
+  if(btnClear) {
+    btnClear.addEventListener('click', () => {
+      modal.classList.add('active');
+    });
+  }
 
-  modalCancel.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.remove('active');
-  });
-
-  modalConfirm.addEventListener('click', async () => {
-    modalConfirm.disabled = true;
-    modalConfirm.textContent = 'Limpiando...';
-
-    try {
-      // Delete codes first (FK dependency), then batches
-      const { error: e1 } = await sb.from('qr_codes').delete().not('id', 'is', null);
-      if (e1) throw e1;
-
-      const { error: e2 } = await sb.from('qr_batches').delete().not('id', 'is', null);
-      if (e2) throw e2;
-
-      window.Toast.success('Base limpiada. Lista para nueva fecha.');
+  if(modalCancel) {
+    modalCancel.addEventListener('click', () => {
       modal.classList.remove('active');
-      await loadStats();
-    } catch (err) {
-      console.error('[Dashboard] Clear error:', err);
-      window.Toast.error('Error al limpiar: ' + err.message);
-    } finally {
-      modalConfirm.disabled = false;
-      modalConfirm.textContent = 'Sí, Limpiar Todo';
-    }
-  });
+    });
+  }
+
+  if(modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+  }
+
+  if(modalConfirm) {
+    modalConfirm.addEventListener('click', async () => {
+      modalConfirm.disabled = true;
+      modalConfirm.textContent = 'Reiniciando...';
+
+      try {
+        // Reiniciar contador a 0
+        const { error } = await sb.from('global_counter').update({ count: 0 }).eq('id', 1);
+        if (error) throw error;
+
+        window.Toast.success('Contador reiniciado a 0.');
+        modal.classList.remove('active');
+        await loadStats();
+      } catch (err) {
+        console.error('[Dashboard] Clear error:', err);
+        window.Toast.error('Error al reiniciar: ' + err.message);
+      } finally {
+        modalConfirm.disabled = false;
+        modalConfirm.textContent = 'Sí, Limpiar Todo';
+      }
+    });
+  }
 })();
