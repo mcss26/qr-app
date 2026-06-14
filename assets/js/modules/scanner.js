@@ -23,13 +23,8 @@
   });
 
   // 2. Auth Guard
-  const session = await window.Auth.guardOrRedirect(['admin', 'operativo']);
+  const session = await window.Auth.guardOrRedirect(['admin']);
   if (!session) return;
-
-  if (session.role === 'operativo') {
-    const btnBack = document.getElementById('btnBackToDashboard');
-    if (btnBack) btnBack.style.display = 'none';
-  }
 
   const sb = window.sb;
   const user = session.user;
@@ -42,13 +37,7 @@
   const btnManualPlus = document.getElementById('btnManualPlus');
   const reticle = document.getElementById('reticle');
   const btnFlash = document.getElementById('btnFlash');
-  const btnLogout = document.getElementById('btnLogout');
   let flashEnabled = false;
-
-  // Logout
-  if (btnLogout) {
-    btnLogout.addEventListener('click', () => window.Auth.logout());
-  }
 
   // 4. State
   let sessionCount = 0;
@@ -122,9 +111,8 @@
       setStatus('error', '', 'Cámara no disponible');
     });
   }
-  // TEMPORARY DISABLED CAMERA: To re-enable, uncomment startScanner();
-  // startScanner();
-  setStatus('idle', 'MANUAL', 'Modo Cuenta Ganado Manual');
+
+  startScanner();
 
   // 7. Manual Button
   btnManualPlus.addEventListener('click', () => {

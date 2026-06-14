@@ -40,7 +40,11 @@
 
       <form id="login-form">
         <div class="auth-field">
-          <input type="password" inputmode="numeric" pattern="[0-9]*" id="pinCode" required placeholder="PIN" style="text-align: center; font-size: 2rem; letter-spacing: 0.5rem;" />
+          <input type="email" id="email" required autocomplete="email" placeholder="Email" />
+        </div>
+
+        <div class="auth-field">
+          <input type="password" id="password" required autocomplete="current-password" placeholder="Contraseña" />
         </div>
 
         <div id="login-error" class="error-message" role="alert" aria-live="polite"></div>

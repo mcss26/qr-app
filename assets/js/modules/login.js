@@ -4,37 +4,50 @@
   const ui = {
     form: document.getElementById('login-form'),
     error: document.getElementById('login-error'),
-    pinCode: document.getElementById('pinCode'),
+    email: document.getElementById('email'),
+    password: document.getElementById('password'),
   };
 
-  const PIN_ADMIN = '0000';
-  const PIN_OPERATIVO = '1234';
-
-  function showError(msg) {
-    if (ui.error) ui.error.textContent = msg;
+  function translateError(msg) {
+    if (!msg) return 'Error al iniciar sesión.';
+    const text = msg.toString().toLowerCase();
+    if (text.includes('invalid login credentials')) return 'Credenciales incorrectas.';
+    if (text.includes('email not confirmed')) return 'Email no confirmado.';
+    return msg;
   }
 
-  // Auto-redirect if already logged in (Persistencia)
+  function showError(msg) {
+    if (ui.error) ui.error.textContent = translateError(msg);
+  }
+
+  // Auto-redirect if already logged in
   try {
-    const session = window.Auth.getSession();
-    if (session && session.role) {
-      window.location.href = window.Auth.roleLanding(session.role);
-      return;
+    const session = await window.Auth.getSession();
+    if (session) {
+      const profile = await window.Auth.getMyProfile();
+      if (profile && profile.role === 'admin') {
+        window.location.href = window.Auth.roleLanding(profile.role);
+        return;
+      }
+      if (!profile || profile.role !== 'admin') {
+        await window.Auth.signOutAndGoLogin();
+      }
     }
   } catch (err) {
     console.error('[login] Error checking session:', err);
   }
 
   // Form submit
-  if (ui.form && ui.pinCode) {
+  if (ui.form && ui.email && ui.password) {
     ui.form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (ui.error) ui.error.textContent = '';
 
-      const pin = ui.pinCode.value.trim();
+      const email = ui.email.value.trim();
+      const password = ui.password.value;
 
-      if (!pin) {
-        showError('Por favor, ingresa un PIN.');
+      if (!email || !password) {
+        showError('Por favor, completa todos los campos.');
         return;
       }
 
@@ -43,27 +56,27 @@
       if (submitBtn) {
         originalText = submitBtn.textContent;
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Validando...';
+        submitBtn.textContent = 'Ingresando...';
       }
 
       try {
-        if (pin === PIN_ADMIN) {
-          window.Auth.setSession('admin');
-          window.location.href = window.Auth.roleLanding('admin');
-        } else if (pin === PIN_OPERATIVO) {
-          window.Auth.setSession('operativo');
-          window.location.href = window.Auth.roleLanding('operativo');
-        } else {
-          throw new Error('PIN incorrecto. Acceso denegado.');
+        const { error } = await window.sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        const profile = await window.Auth.getMyProfile();
+        if (!profile || profile.role !== 'admin') {
+          await window.sb.auth.signOut();
+          throw new Error('Acceso denegado. Solo administradores.');
         }
+
+        window.location.href = window.Auth.roleLanding(profile.role);
       } catch (err) {
+        console.error('[login] Sign in error:', err);
         showError(err.message || 'Error desconocido.');
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
         }
-        ui.pinCode.value = ''; // limpiar pin en error
-        ui.pinCode.focus();
       }
     });
   }

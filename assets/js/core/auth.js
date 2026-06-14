@@ -1,6 +1,6 @@
 /**
  * @fileoverview Auth Module — QR Gate App
- * Simplified: PIN based authentication (localStorage).
+ * Simplified: only 'admin' role has access.
  */
 window.Auth = {
   appBasePath() {
@@ -27,47 +27,67 @@ window.Auth = {
   roleLanding(role) {
     const r = String(role || "").toLowerCase().trim();
     if (r === "admin") return this.toAppPath("pages/dashboard");
-    if (r === "operativo") return this.toAppPath("pages/scanner");
     return this.toAppPath("index");
   },
 
-  // Obtiene la sesión actual desde localStorage
-  getSession() {
-    const sessionStr = localStorage.getItem('qr_gate_session');
-    if (!sessionStr) return null;
-    try {
-      const session = JSON.parse(sessionStr);
-      return session;
-    } catch(e) {
-      return null;
+  checkSb() {
+    if (!window.sb) {
+      console.warn("[Auth] window.sb not initialized yet.");
+      return false;
     }
+    return true;
   },
 
-  // Guarda la sesión
-  setSession(role) {
-    localStorage.setItem('qr_gate_session', JSON.stringify({
-      role: role,
-      user: { id: 'local-' + role } // Objeto mockeado por si algún script anterior espera user.id
-    }));
+  async getSession() {
+    if (!this.checkSb()) return null;
+    const { data, error } = await window.sb.auth.getSession();
+    if (error) { console.error("Error getting session:", error); return null; }
+    return data.session;
+  },
+
+  async getUser() {
+    if (!this.checkSb()) return null;
+    const { data, error } = await window.sb.auth.getUser();
+    if (error) { console.error("Error getting user:", error); return null; }
+    return data.user;
+  },
+
+  async getMyProfile() {
+    const user = await this.getUser();
+    if (!user) return null;
+    const { data, error } = await window.sb
+      .from("profiles")
+      .select("id, full_name, role")
+      .eq("id", user.id)
+      .single();
+    if (error) { console.error("Error fetching profile:", error); return null; }
+    return data;
   },
 
   async guardOrRedirect(allowedRoles = []) {
     document.body.style.visibility = 'hidden';
     const safetyTimer = setTimeout(() => {
       document.body.style.visibility = 'visible';
-    }, 1000);
+    }, 5000);
 
     try {
       const allowed = (allowedRoles || []).map(r => String(r).toLowerCase().trim()).filter(Boolean);
-      const session = this.getSession();
+      const session = await this.getSession();
 
-      if (!session || !session.role) {
+      if (!session) {
         clearTimeout(safetyTimer);
         window.location.href = this.toAppPath("index");
         return null;
       }
 
-      const role = session.role.toLowerCase();
+      const profile = await this.getMyProfile();
+      if (!profile) {
+        clearTimeout(safetyTimer);
+        window.location.href = this.toAppPath("index");
+        return null;
+      }
+
+      const role = String(profile.role || "").toLowerCase().trim();
       if (allowed.length > 0 && !allowed.includes(role)) {
         clearTimeout(safetyTimer);
         window.location.href = this.toAppPath("index");
@@ -76,18 +96,19 @@ window.Auth = {
 
       clearTimeout(safetyTimer);
       document.body.style.visibility = 'visible';
-      return session;
+      return { user: session.user, profile: { ...profile, role } };
     } catch (err) {
       clearTimeout(safetyTimer);
       document.body.style.visibility = 'visible';
       console.error('[Auth] guardOrRedirect failed:', err);
-      window.location.href = this.toAppPath("index");
       return null;
     }
   },
 
-  logout() {
-    localStorage.removeItem('qr_gate_session');
+  async signOutAndGoLogin() {
+    await window.sb.auth.signOut();
     window.location.href = this.toAppPath("index");
-  }
+  },
+
+  logout() { return this.signOutAndGoLogin(); }
 };
