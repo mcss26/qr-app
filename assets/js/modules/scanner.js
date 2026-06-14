@@ -23,8 +23,13 @@
   });
 
   // 2. Auth Guard
-  const session = await window.Auth.guardOrRedirect(['admin']);
+  const session = await window.Auth.guardOrRedirect(['admin', 'operativo']);
   if (!session) return;
+
+  if (session.role === 'operativo') {
+    const btnBack = document.getElementById('btnBackToDashboard');
+    if (btnBack) btnBack.style.display = 'none';
+  }
 
   const sb = window.sb;
   const user = session.user;
