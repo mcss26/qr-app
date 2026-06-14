@@ -112,7 +112,7 @@
     });
   }
 
-  startScanner();
+  // startScanner(); // Temporarily disabled
 
   // 7. Manual Button
   btnManualPlus.addEventListener('click', () => {
