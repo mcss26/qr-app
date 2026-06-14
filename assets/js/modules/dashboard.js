@@ -26,11 +26,15 @@
         .eq('id', 1)
         .single();
 
-      if (!error && data) {
-        statScanned.textContent = data.count || 0;
+      if (error) {
+        console.error('[Dashboard] Error de Supabase al cargar stats:', error);
+      }
+
+      if (data) {
+        statScanned.textContent = data.count !== null ? data.count : 0;
       }
     } catch (err) {
-      console.error('[Dashboard] Error loading stats:', err);
+      console.error('[Dashboard] Exception al cargar stats:', err);
     }
   }
 
