@@ -68,8 +68,24 @@
 
 
   // 7. Manual Button
-  btnManualPlus.addEventListener('click', () => {
+  let isThrottled = false;
+  
+  btnManualPlus.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); // Previene 'click' doble y zoom
+    if (isThrottled) return;
+    
+    isThrottled = true;
     incrementCount('Manual');
+    
+    // Anti-doble tap rápido (debounce)
+    setTimeout(() => {
+      isThrottled = false;
+    }, 150);
+  });
+
+  // Prevenir el menú contextual en long-press
+  btnManualPlus.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
   });
 
 
