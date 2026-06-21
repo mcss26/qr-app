@@ -683,3 +683,54 @@ body.scanner-mode {
   transform: scale(0.96);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--success) 40%, transparent);
 }
+
+/* ── Dashboard Specifics ─────────────────────────────────────────────── */
+.dashboard-content {
+  max-width: 800px;
+}
+
+.hero-zone-dashboard {
+  margin-bottom: 48px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.hero-scan-label {
+  font-size: 1.5rem;
+  letter-spacing: 0.15em;
+}
+
+.hero-refresh-badge {
+  margin-top: 16px;
+}
+
+.nav-grid-single {
+  grid-template-columns: 1fr;
+}
+
+.nav-card-icon-lg {
+  font-size: 48px;
+}
+
+.nav-card-label-lg {
+  font-size: 1.2rem;
+  margin-top: 8px;
+}
+
+.danger-zone-divider {
+  margin: 48px 0;
+}
+
+.btn-danger-lg {
+  height: 64px;
+  font-size: 1.1rem;
+  border-style: dashed;
+}
+
+.modal-actions-dashboard {
+  margin-top: 32px;
+}

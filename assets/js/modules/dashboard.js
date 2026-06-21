@@ -46,6 +46,10 @@
     .on('postgres_changes', { event: '*', schema: 'public', table: 'global_counter' }, payload => {
       if (payload.new && payload.new.count !== undefined) {
         statScanned.textContent = payload.new.count;
+        
+        // Efecto visual al actualizar
+        statScanned.classList.add('pulse-glow');
+        setTimeout(() => statScanned.classList.remove('pulse-glow'), 150);
       }
     })
     .subscribe();
@@ -92,7 +96,7 @@
         window.Toast.error('Error al reiniciar: ' + err.message);
       } finally {
         modalConfirm.disabled = false;
-        modalConfirm.textContent = 'Sí, Limpiar Todo';
+        modalConfirm.textContent = 'Sí, Reiniciar a 0';
       }
     });
   }
