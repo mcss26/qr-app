@@ -35,6 +35,8 @@
   let sessionCount = 0;
   
   // 5. Inicializar el Contador desde Supabase
+  let lastTapTime = 0;
+  
   async function initCounter() {
     try {
       const { data, error } = await sb
@@ -52,8 +54,20 @@
       sb.channel('realtime_counter')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'global_counter' }, payload => {
           if (payload.new && payload.new.count !== undefined) {
-            sessionCount = payload.new.count;
-            scanCount.textContent = sessionCount;
+            const serverCount = payload.new.count;
+            const timeSinceTap = Date.now() - lastTapTime;
+            
+            // Lógica Monotónica Anti-Salto (Anti-Jumping):
+            // Si el usuario está tocando activamente (< 2.5s), solo aceptamos el valor del servidor
+            // si es MAYOR que el nuestro (ej. otro portero sumó). 
+            // Si no estamos tocando, aceptamos cualquier valor (incluso resets a 0).
+            if (timeSinceTap > 2500) {
+              sessionCount = serverCount;
+              scanCount.textContent = sessionCount;
+            } else if (serverCount > sessionCount) {
+              sessionCount = serverCount;
+              scanCount.textContent = sessionCount;
+            }
           }
         })
         .subscribe();
@@ -93,6 +107,7 @@
   async function incrementCount(source) {
     // Optimistic UI: Incrementamos localmente al instante
     sessionCount++;
+    lastTapTime = Date.now();
     scanCount.textContent = sessionCount;
     
     // Feedback Ultra-Rápido (Ghost Glass style)
