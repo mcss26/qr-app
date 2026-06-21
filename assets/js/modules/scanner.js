@@ -95,12 +95,13 @@
     sessionCount++;
     scanCount.textContent = sessionCount;
     
-    // Feedback Ultra-Rápido
+    // Feedback Ultra-Rápido (Ghost Glass style)
     if ('vibrate' in navigator) navigator.vibrate([50]); 
-    scanCount.style.color = 'var(--success-base)';
+    
+    scanCount.classList.add('pulse-glow');
     
     setTimeout(() => {
-      scanCount.style.color = '';
+      scanCount.classList.remove('pulse-glow');
     }, 150);
 
     // Sincronizar con Supabase (Fire and Forget)

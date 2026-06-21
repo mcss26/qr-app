@@ -589,3 +589,97 @@ body.scanner-mode {
 .empty-state-text {
   font-size: var(--fs-base);
 }
+
+/* ── Mobile First Scanner Counter ──────────────────────────────────────── */
+.nav-back-btn {
+  border: none;
+  background: var(--bg-elevated);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  transition: background var(--transition-base);
+}
+.nav-back-btn:active {
+  background: var(--bg-surface-hover);
+}
+
+.ghost-glass-badge {
+  margin-bottom: 0;
+  background: var(--white-alpha-05);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scanner-counter-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl);
+  background: var(--bg-body);
+  flex: 1;
+}
+
+.counter-display {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.scan-label {
+  font-size: var(--fs-lg);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.giant-counter {
+  font-size: clamp(5rem, 20vw, 8rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  transition: color 0.15s ease-out, transform 0.1s ease-out;
+}
+.giant-counter.pulse-glow {
+  color: var(--success);
+  transform: scale(1.05);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--success) 40%, transparent);
+}
+
+.giant-btn {
+  width: 100%;
+  padding: 24px;
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  border-radius: var(--radius-xl);
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--success) 20%, transparent);
+  transition: all 0.15s ease-out;
+}
+.giant-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--success) 40%, transparent);
+}

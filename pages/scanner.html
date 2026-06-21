@@ -13,7 +13,7 @@
       font-src 'self';
       frame-src 'none';
       media-src 'self' blob:;">
-  <title>QR Gate — Escanear</title>
+  <title>QR Gate — Contador</title>
   <meta name="theme-color" content="#0a0a0a">
 
   <link rel="stylesheet" href="../assets/css/tokens.css" />
@@ -25,29 +25,32 @@
   <script defer src="../assets/js/core/supabase-client.js"></script>
   <script defer src="../assets/js/core/auth.js"></script>
   <script defer src="../assets/js/core/toast.js"></script>
-  <script defer src="../assets/js/modules/scanner.js?v=1.3"></script>
+  <script defer src="../assets/js/modules/scanner.js?v=1.4"></script>
 </head>
 
 <body class="scanner-mode">
   <!-- Top Navigation Floating -->
   <div class="scanner-header">
-    <a href="dashboard.html" class="btn btn-ghost btn-icon" style="border:none; background:var(--bg-elevated); width:40px; height:40px; border-radius:50%;">
+    <a href="dashboard.html" class="btn btn-ghost btn-icon nav-back-btn" aria-label="Volver">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
     </a>
     
-
+    <div class="status-badge idle ghost-glass-badge" id="statusBadge">
+      <span id="statusIcon">MANUAL</span>
+      <span id="statusText">Contador Activo</span>
+    </div>
   </div>
 
   <main class="scanner-main">
 
     <!-- Bottom Half (Counter & Manual Button) -->
-    <div class="scanner-counter-section" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; background: var(--bg-base); flex: 1;">
-      <div class="counter-display" style="text-align: center; margin-bottom: 2rem;">
-        <div class="scan-label" style="font-size: 1.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Acreditados</div>
-        <div class="scan-count giant-counter" id="scanCount" style="font-size: 6rem; font-weight: 800; line-height: 1; color: var(--text-base);">0</div>
+    <div class="scanner-counter-section">
+      <div class="counter-display">
+        <div class="scan-label">Acreditados</div>
+        <div class="scan-count giant-counter" id="scanCount">0</div>
       </div>
-      <button type="button" id="btnManualPlus" class="btn btn-primary giant-btn" style="width: 100%; height: 35vh; max-height: 400px; font-size: 5rem; font-weight: 800; border-radius: 24px; background: var(--success-base); color: #000; border: none; cursor: pointer; text-transform: uppercase; touch-action: manipulation; user-select: none; -webkit-user-select: none; display: flex; align-items: center; justify-content: center;">
-        +1
+      <button type="button" id="btnManualPlus" class="btn btn-success giant-btn">
+        +1 MANUAL
       </button>
     </div>
   </main>
